@@ -10,21 +10,18 @@ var particles;
 var sawClock;
 var sawDeltaTime;
 var particleDeltaTime;
-var bounces;
-var count;
 
 // particle attribute initialization
-var max_angle = 30;
-var min_angle = 0;
-var max_vel = 15;
-var min_vel = 0;
-var px = 0.125;
-var py = 1;
-var pz = 0;
-var pc = 10000;
-var cpc = 50;
+var max_angle = 30;	// max particle angle
+var min_angle = 0;	// min particle angle
+var max_vel = 15;	// max particle velocity
+var min_vel = 0;	// min particle velocity
+var px = 0.125;		// particle positon - x
+var py = 1;			// particle positon - y
+var pz = 0;			// particle positon - z
+var pc = 10000;		// maximum particle count
+var cpc = 50;		// current particle count
 var gravity = 9.8;
-
 
 // GUI Properties class 
 var Properties = function() {
@@ -34,7 +31,7 @@ var Properties = function() {
   this.max_vel = max_vel;
 };
 
-// GUI handler
+// GUI handler (to control Gravity, Particle Count, Max Particle angle, Max Particle velocity during Runtime)
 window.onload = function() {
 	var prop = new Properties();
 	var gui = new dat.GUI();
@@ -43,6 +40,7 @@ window.onload = function() {
 	});
 	gui.add(prop, 'particles', 1, pc).step(1).name("Particle Count").onFinishChange(function(value) {
 		if (cpc>value) {
+			// Remove old particles when particle size is decreased in GUI
 			for (var i = value; i < cpc; i++) {
 				particles.vertices[i].x = px;
 				particles.vertices[i].y = py;
@@ -69,8 +67,7 @@ init();
 animate();
 
 // Sets up the scene.
-function init()
-{
+function init() {
 	// Create the scene and set the scene size.
 	scene = new THREE.Scene();
 	
@@ -94,14 +91,9 @@ function init()
 	// Create a camera, zoom it out from the model a bit, and add it to the scene.
 	camera = new THREE.PerspectiveCamera(45.0, WIDTH / HEIGHT, 0.01, 100);
 	camera.position.set(-2, 2, -5);
-	//camera.lookAt(new THREE.Vector3(5,0,0));
 	scene.add(camera);
-	count = 0;
-	bounces = 0;
 	// Create an event listener that resizes the renderer with the browser window.
-	window.addEventListener('resize',
-		function ()
-		{
+	window.addEventListener('resize', function () {
 			var WIDTH = window.innerWidth, HEIGHT = window.innerHeight;
 			renderer.setSize(WIDTH, HEIGHT);
 			camera.aspect = WIDTH / HEIGHT;
@@ -141,6 +133,7 @@ function init()
 	var sphere_texPath = 'assets/rocky.jpg';
 	var sphere_objPath = 'assets/sphere.obj';
 	OBJMesh(sphere_objPath, sphere_texPath, "sphere");
+	
 	/*
 	 //Cube
 	var cube_texPath = 'assets/rocky.jpg';
@@ -166,7 +159,7 @@ function init()
 	controls.minDistance = 0.01;
 	controls.maxDistance = 30;
 
-
+	// clock for saw rotation
 	sawClock = new THREE.Clock();
 	sawDeltaTime = sawClock.getDelta();
 
@@ -205,8 +198,7 @@ function createParticleSystem() {
 	}
  
 	// Create the material that will be used to render each vertex of the geometry
-	var particleMaterial = new THREE.PointsMaterial(
-			{
+	var particleMaterial = new THREE.PointsMaterial({
 			 color: 0xffffcc,
 			 size: 0.5,
 			 map: THREE.ImageUtils.loadTexture("assets/spark.png"),
@@ -220,8 +212,7 @@ function createParticleSystem() {
 	return particleSystem;  
 }
 
-function animate()
-{
+function animate() {
 	sawDeltaTime = sawClock.getDelta();
 	renderer.render(scene, camera);
 	controls.update();
@@ -234,10 +225,10 @@ function animate()
 
 		// Calculating a perticle's trajectory path position at current frame
 		var u = particle.v0;		// initial velocity of the particle
-		var angle = particle.angle *Math.PI/180;		// angle of 
+		var angle = particle.angle *Math.PI/180;		// angle at which the particle is launched
 		var cos_t = Math.cos(angle); 
 		particleDeltaTime = particle.clock.getDelta();
-		t = particle.clock.getElapsedTime();
+		t = particle.clock.getElapsedTime();			// time elapsed since particle launch
 		x = u*t*cos_t;
 		y = x*Math.tan(angle) - ((gravity)*x*x/(u*u*cos_t*cos_t));
 
@@ -247,7 +238,6 @@ function animate()
 
 		// Sphere collision detection and bounce back
 		if(i<cpc-2 && insideSphere(vert.x,vert.y,vert.z)){
-			console.log(i+" is insideSphere");
 			particle.bounces++;
 			particles.vertices[i+1].x = vert.x;
 			particles.vertices[i+1].y = vert.y *= -1;
@@ -262,7 +252,6 @@ function animate()
 
 		// Bunny collision detection and bounce back
 		if (i<cpc-2 && insideBunny(vert.x,vert.y,vert.z)) {
-			console.log(i+" is insideBunny");
 			particle.bounces++;
 			particles.vertices[i+1].x = vert.x;
 			particles.vertices[i+1].y = vert.y *=-1;
@@ -277,7 +266,7 @@ function animate()
 		// Collision with ground (splitting and bouncing)
 		if (vert.y<0) {
 
-			// bounce particle
+			// bounce particle when it hits the ground
 			particle.bounces++;
 			particle.v0 = u*0.5;
 			vert.y = vert.y * (-0.5);
@@ -285,7 +274,7 @@ function animate()
 			particle.velocity.z=Math.random()*2-1;
 			particle.clock = new THREE.Clock();
 
-			// destroy particle after 3 bounces
+			// destroy particle after 3 bounces (re-initializing)
 			if(particle.bounces>=3){
 				particles.vertices[i].x = px;
 				particles.vertices[i].y = py;
@@ -328,15 +317,17 @@ function animate()
 
 	}
 
+	// animate (60 fps)
 	requestAnimationFrame(animate); 
 	particleSystem.geometry.verticesNeedUpdate = true;
 
-	//rotate sawblade
+	// rotate sawblade
 	var sawbladeAsset = scene.getObjectByName( "sawblade" );
 	translate(sawbladeAsset, 0,-1.5,0);
 	rotate(sawbladeAsset, new THREE.Vector3(0,0,1), -9* sawDeltaTime); 
 	translate(sawbladeAsset, 0,1.5,0);
 
+	// Performance statistics updation for every frame 
 	stats.update();
 }
 
@@ -344,10 +335,9 @@ function animate()
 function insideSphere(x,y,z) {
 	var ra = 1/Math.sqrt(2);
 	value = 2*(x+2)*(x+2) + 2*(y-ra)*(y-ra) + 2*(z-1)*(z-1) - 0.5;
-	if (value <=  0.1) {
-		console.log("value:" +value);
+	if (value <=  0.1)
 		return true;
-	}else
+	else
 		return false;
 }
 
@@ -365,31 +355,28 @@ function insideBunny(x,y,z) {
 		return false;
 }
 
-function rotate(object, axis, radians)
-{
+// Rotate Object3D
+function rotate(object, axis, radians) {
 	var rotObjectMatrix = new THREE.Matrix4();
 	rotObjectMatrix.makeRotationAxis(axis.normalize(), radians);
 	object.applyMatrix(rotObjectMatrix);
 }
 
-function translate(object, x, y, z)
-{
+// Translate Object3D
+function translate(object, x, y, z) {
 	var transObjectMatrix = new THREE.Matrix4();
 	transObjectMatrix.makeTranslation(x, y, z);
 	object.applyMatrix(transObjectMatrix);
 }
 
-function OBJMesh(objpath, texpath, objName)
-{
+// Load Object and Texture
+function OBJMesh(objpath, texpath, objName) {
 	var texture = new THREE.TextureLoader( loadingManager ).load(texpath, onLoad, onProgress, onError);
 	var loader  = new THREE.OBJLoader( loadingManager ).load(objpath,  
-		function ( object )
-		{
+		function ( object ) {
 			object.traverse(
-				function ( child )
-				{
-					if(child instanceof THREE.Mesh)
-					{
+				function ( child ) {
+					if(child instanceof THREE.Mesh) {
 						child.material.map = texture;
 						child.material.needsUpdate = true;
 					}
@@ -401,61 +388,52 @@ function OBJMesh(objpath, texpath, objName)
 
 			/*
 			if(objName=="sawblade")
-				translate(object, 0,1.5,0); //move it up to slab*/
+				translate(object, 0,1.5,0); //move it up to slab
+			*/
 
-			if (objName=="sphere"){
-				translate(object,1,0,1);
-			}
-				
+			if (objName=="sphere")
+				translate(object,1,0,1);				
 			else if (objName=="cone")
 				translate(object,1,0,-0.5);
 			else if (objName=="cube")
 				translate(object,0,0,-1);
 			else if (objName=="slab")
 				translate(object,0.5,-0.245,0);
-			else if (objName=="bunny") {
+			else if (objName=="bunny")
 				translate(object,1,0,-1);
-
-			}
+	
 			scene.add( object );
 			onLoad( object );
 		},
 	onProgress, onError);
 }
 
-function onLoad( object )
-{
+function onLoad( object ) {
 	putText(0, "", 0, 0);
 	i_share ++;
 	if(i_share >= n_share)
 		i_share = 0;
-
 }
 
-function onProgress( xhr )
-{ 
-	if ( xhr.lengthComputable )
-	{
+function onProgress( xhr ) { 
+	if ( xhr.lengthComputable ) {
 		var percentComplete = 100 * ((xhr.loaded / xhr.total) + i_share) / n_share;
 		putText(0, Math.round(percentComplete, 2) + '%', 10, 10);
 	}
 }
 
-function onError( xhr )
-{
+function onError( xhr ) {
 	putText(0, "Error", 10, 10);
 }
 
-function putText( divid, textStr, x, y )
-{
+function putText( divid, textStr, x, y ) {
 	var text = document.getElementById("info");
 	text.innerHTML = textStr;
 	text.style.left = x + 'px';
 	text.style.top  = y + 'px';
 }
 
-function putTextExt(dividstr, textStr) //does not need init
-{
+function putTextExt(dividstr, textStr) {  //does not need init
 	var text = document.getElementById(dividstr);
 	text.innerHTML = textStr;
 }
