@@ -10,10 +10,8 @@ var particleSystem;
 var particleCount;
 var particles;
 var sawClock;
-var particleClock;
 var sawDeltaTime;
 var particleDeltaTime;
-var particleElapsedTime;
 var bounces;
 var count;
 
@@ -25,7 +23,7 @@ var min_vel = 0;
 var px = 0.125;
 var py = 1;
 var pz = 0;
-var pc = 1000;
+var pc = 10000;
 var cpc = 50;
 var gravity = 9.8;
 
@@ -227,7 +225,6 @@ function createParticleSystem() {
 function animate()
 {
 	sawDeltaTime = sawClock.getDelta();
-
 	renderer.render(scene, camera);
 	controls.update();
 
@@ -241,6 +238,7 @@ function animate()
 		var u = particle.v0;		// initial velocity of the particle
 		var angle = particle.angle *Math.PI/180;		// angle of 
 		var cos_t = Math.cos(angle); 
+		particleDeltaTime = particle.clock.getDelta();
 		t = particle.clock.getElapsedTime();
 		x = u*t*cos_t;
 		y = x*Math.tan(angle) - ((gravity)*x*x/(u*u*cos_t*cos_t));
@@ -269,7 +267,7 @@ function animate()
 			console.log(i+" is insideBunny");
 			particle.bounces++;
 			particles.vertices[i+1].x = vert.x;
-			particles.vertices[i+1].y = vert.y;
+			particles.vertices[i+1].y = vert.y *=-1;
 			particles.vertices[i+1].z = vert.z;
 			particles.vertices[i+1].velocity = new THREE.Vector3(-particle.velocity.x,0, particle.velocity.z);
 			particles.vertices[i+1].angle = Math.random()*(max_angle-min_angle+1)+min_angle;
@@ -331,6 +329,8 @@ function animate()
 		}
 
 	}
+
+	requestAnimationFrame(animate); 
 	particleSystem.geometry.verticesNeedUpdate = true;
 
 	//rotate sawblade
@@ -340,7 +340,6 @@ function animate()
 	translate(sawbladeAsset, 0,1.5,0);
 
 	stats.update();
-	requestAnimationFrame(animate); 
 }
 
 // sphere collision detection (sphere equation substitution)
