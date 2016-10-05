@@ -1,7 +1,5 @@
 // Set up three.js global variables
 var scene, camera, renderer, container, loadingManager,stats;
-// Set up avatar global variables
-var bbox;
 // Transfer global variables
 var i_share = 0, n_share = 1, i_delta = 0.0;
 
