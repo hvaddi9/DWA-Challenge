@@ -15,7 +15,7 @@ var particleDeltaTime;
 var max_angle = 30;	// max particle angle
 var min_angle = 0;	// min particle angle
 var max_vel = 15;	// max particle velocity
-var min_vel = 0;	// min particle velocity
+var min_vel = 5;	// min particle velocity
 var px = 0.125;		// particle positon - x
 var py = 1;			// particle positon - y
 var pz = 0;			// particle positon - z
@@ -347,9 +347,9 @@ function insideBunny(x,y,z) {
 		return true;
 	else if (x<-1.3 && x>-1.75 && y>0.75 && y<1.2 && z<-0.5 && z>-1) // head
 		return true;
-	else if (x<-1.7 && x>-2.3 && y>1.1 && y<1.45 && z<-0.35 && z>-0.6) // left year
+	else if (x<-1.7 && x>-2.3 && y>1.1 && y<1.45 && z<-0.35 && z>-0.6) // left ear
 		return true;
-	else if (x<-1.7 && x>-2.3 && y>1.1 && y<1.45 && z<-0.75 && z>-1.1) // right year
+	else if (x<-1.7 && x>-2.3 && y>1.1 && y<1.45 && z<-0.75 && z>-1.1) // right Ear
 		return true;
 	else
 		return false;
