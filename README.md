@@ -20,6 +20,6 @@ You will need to use your coding ability to create ‘sparks’. You are provide
   4. open `localhost/DWA-Challenge-master` in your browser (preferably latest version of Chrome)
   
 ### Method 2
-  [DreamWorks Animation Challenge (hvaddi9)] (https://hvaddi9-dwa-challenge.firebaseapp.com) - open this link
+  [DreamWorks Animation Challenge (hvaddi9)] (https://hemanthvaddi.me/DWA-Challenge) - open this link
 
 
