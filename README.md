@@ -1,6 +1,6 @@
 # DreamWorks Animation - Challenge
 
-DreamWorks Animation Effects Challenge on HackerEarth [Checkout Problem Statment](https://www.hackerearth.com/sprints/dreamworks-hackathon/)
+DreamWorks Animation Effects Challenge on HackerEarth [(Checkout Problem Statment)](https://www.hackerearth.com/sprints/dreamworks-hackathon/)
 
 ## Description of Challenge
 You will need to use your coding ability to create ‘sparks’. You are provided with some models / assets, a reference scene and a rough sketch for visual direction. You can start with the reference scene and its coding language or create your own from scratch in your language of choice. You are not allowed to use any physics/collision engines such as Bullet, unity, unreal etc. You essentially have to write code for the mathematics (external vector/math library allowed) and physics (external library not allowed as mentioned above) of the motion of the sparks.
